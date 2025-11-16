@@ -1,0 +1,123 @@
+@startuml
+
+actor Morador
+actor Funcionário
+
+participant NoticesController as NoticesC
+participant NoticesService as NoticesS
+participant NoticesRepository as NoticesR
+
+group Mural de Avisos (UC-06)
+autonumber
+
+Morador -> NoticesC : findAll(Request)
+activate Morador
+activate NoticesC
+
+NoticesC -> NoticesS : findAllByUserRoles(User)
+activate NoticesS
+
+NoticesS -> NoticesS : findAllByRoles(Roles)
+
+NoticesS -> NoticesR : createQueryBuilder()
+activate NoticesR
+NoticesS <- NoticesR : QueryBuilder
+deactivate NoticesR
+
+NoticesS -> QueryBuilder : andWhere(Condition, Variables)
+activate QueryBuilder
+NoticesS <- QueryBuilder : QueryBuilder
+deactivate QueryBuilder
+
+NoticesS -> QueryBuilder : andWhere(Condition, Variables)
+activate QueryBuilder
+NoticesS <- QueryBuilder : QueryBuilder
+deactivate QueryBuilder
+
+NoticesS -> QueryBuilder : getMany()
+activate QueryBuilder
+NoticesS <- QueryBuilder : Array<Notice>
+deactivate QueryBuilder
+
+NoticesC <- NoticesS : Array<Notice>
+
+deactivate NoticesS
+
+Morador <- NoticesC : Array<Notice>
+
+deactivate NoticesC
+deactivate Morador
+
+end
+
+participant DeliveriesController as DeliveriesC
+participant DeliveriesService as DeliveriesS
+participant DeliveriesRepository as DeliveriesR
+
+participant ApartmentService as ApartmentS
+
+group Registrar Encomenda (UC-15)
+autonumber
+
+Funcionário -> DeliveriesC : create(Request, CreateDeliveryDto)
+activate Funcionário
+activate DeliveriesC
+
+DeliveriesC -> DeliveriesS : create(User, CreateDeliveryDto)
+activate DeliveriesS
+
+DeliveriesS -> ApartmentS : findOne(Id)
+activate ApartmentS
+
+DeliveriesS <-- ApartmentS : Apartment
+deactivate
+
+DeliveriesS -> DeliveriesR : create(Delivery)
+activate DeliveriesR
+
+DeliveriesS <-- DeliveriesR : Delivery
+deactivate DeliveriesR
+
+DeliveriesC <-- DeliveriesS : DeliveryResponse
+deactivate DeliveriesS
+
+Funcionário <-- DeliveriesC : DeliveryReponse
+deactivate DeliveriesC
+
+deactivate Funcionário
+
+end
+
+group Confirmar Retirada da Encomenda (UC-05)
+autonumber
+
+Morador -> DeliveriesC : confirm(Id, Request)
+activate Morador
+activate DeliveriesC
+
+DeliveriesC -> DeliveriesS : confirm(Id, Request)
+activate DeliveriesS
+
+DeliveriesS -> DeliveriesR : findOne(Query)
+activate DeliveriesR
+
+DeliveriesS <- DeliveriesR : Delivery
+deactivate DeliveriesR
+
+
+DeliveriesS -> DeliveriesR : save(ConfirmedDelivery)
+activate DeliveriesR
+
+DeliveriesS <- DeliveriesR : Delivery
+deactivate DeliveriesR
+
+DeliveriesC <- DeliveriesS : DeliveryResponse
+deactivate DeliveriesS
+
+Morador <- DeliveriesC : DeliveryResponse
+deactivate DeliveriesC
+deactivate Morador
+
+end
+
+@enduml
