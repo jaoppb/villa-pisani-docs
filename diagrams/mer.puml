@@ -1,0 +1,179 @@
+@startuml
+
+!define table(ename, dbname) entity "<b>ename</b>\n<font size=10 color=gray>(dbname)</font>"
+
+!define pkey(x) {field} <b><color:DarkGoldenRod><&key></color> x</b>
+!define fkey(x) {field} <color:#AAAAAA><&key></color> x
+!define column(x) {field} <color:#EFEFEF><&media-record></color> x
+
+hide stereotypes
+hide methods
+hide circle
+
+top to bottom direction
+
+skinparam linetype ortho
+
+skinparam class {
+  BackgroundColor white
+}
+
+
+table( BillFile, bill_files ) as bill_files {
+  pkey( id ): VARCHAR(255) 
+  column( name ): VARCHAR(255) 
+  column( mimetype ): VARCHAR(255) 
+}
+
+table( Bill, bills ) as bills {
+  pkey( id ): VARCHAR(255) 
+  column( externalId ): VARCHAR(255) 
+  column( value ): INT(11) 
+  column( createdAt ): DATETIME(6) 
+  column( dueDate ): DATETIME 
+  column( refer ): DATETIME 
+  column( state ): ENUM 
+  fkey( fileId ): VARCHAR(36) <<FK>>
+  fkey( apartmentNumber ): INT(11) <<FK>>
+}
+
+table( Delivery, deliveries ) as deliveries {
+  pkey( id ): VARCHAR(255) 
+  column( recipient ): VARCHAR(255) 
+  column( sender ): VARCHAR(255) 
+  column( receivedAt ): DATETIME(6) 
+  column( deliveredTo ): VARCHAR(255) 
+  column( deliveredAt ): DATETIME 
+  column( confirmAt ): DATETIME 
+  column( status ): ENUM 
+  fkey( receiverId ): VARCHAR(36) <<FK>>
+  fkey( confirmToId ): VARCHAR(36) <<FK>>
+  fkey( apartmentNumber ): INT(11) <<FK>>
+}
+
+table( Notice, notices ) as notices {
+  pkey( id ): VARCHAR(255) 
+  column( title ): VARCHAR(255) 
+  column( body ): VARCHAR(255) 
+  column( createAt ): DATETIME(6) 
+  column( updateAt ): DATETIME(6) 
+  column( target ): ENUM 
+  column( roles ): SET 
+  column( important ): TINYINT(4) 
+  fkey( authorId ): VARCHAR(36) <<FK>>
+}
+
+table( Apartment, apartments ) as apartments {
+  column( floor ): INT(11) 
+  pkey( number ): INT(11) 
+  fkey( ownerId ): VARCHAR(36) <<FK>>
+}
+
+table( Feedback, feedback ) as feedback {
+  pkey( id ): VARCHAR(255) 
+  column( body ): TEXT 
+  column( sentAt ): DATETIME(6) 
+  column( status ): TINYINT(4) 
+  fkey( userId ): VARCHAR(36) <<FK>>
+}
+
+table( User, users ) as users {
+  pkey( id ): VARCHAR(255) 
+  column( name ): VARCHAR(255) 
+  column( email ): VARCHAR(255) 
+  column( password ): VARCHAR(255) 
+  column( cpf ): VARCHAR(255) 
+  column( birthDate ): DATETIME 
+  column( roles ): SET 
+  column( lastPasswordChange ): DATETIME 
+  column( createAt ): DATETIME(6) 
+  column( updateAt ): DATETIME(6) 
+  fkey( apartmentNumber ): INT(11) <<FK>>
+}
+
+table( Rule, rules ) as rules {
+  pkey( id ): VARCHAR(255) 
+  column( title ): VARCHAR(255) 
+  column( body ): VARCHAR(255) 
+  column( createAt ): DATETIME(6) 
+  column( updateAt ): DATETIME(6) 
+}
+
+table( Regra, regras ) as regras {
+  pkey( id ): INT(11) 
+  column( titulo ): VARCHAR(255) 
+  column( descricao ): TEXT 
+  column( dataCriacao ): TIMESTAMP 
+}
+
+table( MeetingFile, meeting_files ) as meeting_files {
+  pkey( id ): VARCHAR(255) 
+  column( name ): VARCHAR(255) 
+  column( mimetype ): VARCHAR(255) 
+}
+
+table( Meeting, meetings ) as meetings {
+  pkey( id ): VARCHAR(255) 
+  column( date ): DATETIME 
+  column( createdAt ): DATETIME(6) 
+  column( updatedAt ): DATETIME(6) 
+  fkey( fileId ): VARCHAR(36) <<FK>>
+}
+
+table( Tag, expense_tags ) as expense_tags {
+  pkey( id ): VARCHAR(255) 
+  column( label ): VARCHAR(255) 
+}
+
+table( ExpenseFile, expense_files ) as expense_files {
+  pkey( id ): VARCHAR(255) 
+  column( name ): VARCHAR(255) 
+  column( mimetype ): VARCHAR(255) 
+  fkey( expenseId ): VARCHAR(36) <<FK>>
+}
+
+table( Expense, expenses ) as expenses {
+  pkey( id ): VARCHAR(255) 
+  column( title ): VARCHAR(255) 
+  column( description ): TEXT 
+  column( createdAt ): DATETIME(6) 
+  column( updatedAt ): DATETIME(6) 
+}
+
+table( Entrega, entrega ) as entrega {
+  pkey( id ): INT(11) 
+  column( descricao ): TEXT 
+  column( destinatario ): VARCHAR(255) 
+  column( codigoRastreio ): VARCHAR(255) 
+  column( dataRecebimento ): DATETIME(6) 
+  column( dataRetirada ): DATETIME 
+  column( status ): VARCHAR(255) 
+}
+
+table( apartments_notices_notices, apartments_notices_notices ) as apartments_notices_notices {
+  pkey( apartmentsNumber ): INT(11) 
+  pkey( noticesId ): VARCHAR(36) 
+}
+
+table( expenses_tags_expense_tags, expenses_tags_expense_tags ) as expenses_tags_expense_tags {
+  pkey( expensesId ): VARCHAR(36) 
+  pkey( expenseTagsId ): VARCHAR(36) 
+}
+
+"bill_files" ||--|| "bills"
+"apartments" ||--o{ "bills"
+"users" ||--o{ "deliveries"
+"users" ||--o{ "deliveries"
+"apartments" ||--o{ "deliveries"
+"users" ||--o{ "notices"
+"users" ||--|| "apartments"
+"users" ||--o{ "feedback"
+"apartments" ||--o{ "users"
+"meeting_files" ||--|| "meetings"
+"expenses" ||--o{ "expense_files"
+"apartments" ||--|{ "apartments_notices_notices"
+"notices" ||--|{ "apartments_notices_notices"
+"expenses" ||--|{ "expenses_tags_expense_tags"
+"expense_tags" ||--|{ "expenses_tags_expense_tags"
+
+@enduml
