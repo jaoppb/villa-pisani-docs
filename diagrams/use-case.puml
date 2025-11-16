@@ -1,0 +1,62 @@
+@startuml
+
+left to right direction
+
+:Morador:
+:Síndico:
+:Funcionário:
+
+Morador <|-- Síndico
+Funcionário <|-- Síndico
+
+:Gateway de Pagamento: as PaymentGateway
+
+(Aceitar convite de apartamento) as UC01
+(Alterar informações pessoais) as UC02
+(Enviar feedback à administração) as UC03
+(Consultar encomendas) as UC04
+(Confirmar retirada) as UC05
+(Visualizar mural de avisos) as UC06
+(Consultar boletos) as UC07
+(Consultar assembleias) as UC08
+(Gerenciar apartamentos) as UC09
+(Convidar usuários para os apartamentos) as UC10
+(Gerenciar usuários) as UC11
+(Gerenciar gastos) as UC12
+(Gerenciar boletos) as UC13
+(Gerenciar assembleias) as UC14
+(Registrar encomenda) as UC15
+(Responder feedback dos moradores) as UC16
+(Gerenciar mural de avisos) as UC17
+(Notificar entrega) as UC18
+(Notificar aviso) as UC19
+(Notificar alteração nos boletos) as UC20
+
+Morador --> UC01
+Morador --> UC02
+Morador --> UC03
+Morador --> UC04
+Morador --> UC05
+Morador --> UC06
+Morador --> UC07
+Morador --> UC08
+
+UC05 .> UC04 : <<includes>>
+
+Síndico --> UC09
+Síndico --> UC10
+Síndico --> UC11
+Síndico --> UC12
+Síndico --> UC13
+Síndico --> UC14
+
+UC13 .> UC20 : <<includes>>
+UC13 --> PaymentGateway
+
+Funcionário --> UC15
+Funcionário --> UC16
+Funcionário --> UC17
+
+UC17 .> UC19 : <<includes>>
+
+@enduml
