@@ -1,0 +1,14 @@
+@startuml
+
+database PostgresSql as DB
+database S3
+node "REST Api" as API
+node "Front End" as APP
+node Email
+
+API --> S3
+API --> DB
+API --> Email
+APP --> API
+
+@enduml
