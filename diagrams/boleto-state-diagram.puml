@@ -1,0 +1,20 @@
+@startuml
+
+[*] --> Pending
+Pending : A conta acabou de ser emitida
+
+Pending --> Canceled : Conta Cancelada
+Canceled : Síndico cancelou a conta
+
+Pending --> Failed : Falha no Gateway ou a Conta Venceu
+Failed : O gateway de pagamento falhou em processar
+Failed : A conta expirou
+
+Pending --> Paid : Conta Paga
+Paid: O gateway de pagamento confirmou o pagamento
+
+Paid --> [*]
+Canceled --> [*]
+Failed --> [*]
+
+@enduml
