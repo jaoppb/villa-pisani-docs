@@ -1,0 +1,15 @@
+@startuml
+
+[*] --> Received : Entrega entregue no condomínio
+
+Received --> Delivered : Entrega entregue no apartamento
+
+Delivered --> Contested : Recebimento negado
+
+Contested --> Confirmed : Recebimento confirmado
+
+Delivered --> Confirmed : Recebimento confirmado
+
+Confirmed --> [*]
+
+@enduml
