@@ -1,0 +1,23 @@
+@startuml
+
+actor User
+
+database "PostgresSql (AWS RDB)" as DB
+database "AWS S3" as S3
+node "REST Api (EC2)" as API
+node "Front End (AWS CloudFront)" as APP
+queue "Notification (AWS SQS)" as Notification
+node "Email (AWS SES)" as Email
+
+API --> S3
+API --> DB
+API <-- DB
+API --> Notification
+Notification --> Email
+APP --> API
+APP <-- S3
+
+User --> APP
+Email --> User
+
+@enduml
