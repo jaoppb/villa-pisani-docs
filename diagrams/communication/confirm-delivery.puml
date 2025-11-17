@@ -1,0 +1,20 @@
+@startuml
+
+actor Morador
+
+boundary DeliveriesController as DeliveriesC
+boundary DeliveriesService as DeliveriesS
+boundary DeliveriesRepository as DeliveriesR
+
+autonumber
+
+Morador -> DeliveriesC : confirm(Id, Request)
+DeliveriesC -> DeliveriesS : confirm(Id, Request)
+DeliveriesS -> DeliveriesR : findOne(Query)
+DeliveriesS <- DeliveriesR : Delivery
+DeliveriesS -> DeliveriesR : save(ConfirmedDelivery)
+DeliveriesS <- DeliveriesR : Delivery
+DeliveriesC <- DeliveriesS : DeliveryResponse
+Morador <- DeliveriesC : DeliveryResponse
+
+@enduml

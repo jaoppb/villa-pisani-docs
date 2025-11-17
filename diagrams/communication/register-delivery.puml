@@ -1,0 +1,21 @@
+@startuml
+
+actor Funcionário
+
+boundary DeliveriesController as DeliveriesC
+boundary DeliveriesService as DeliveriesS
+boundary DeliveriesRepository as DeliveriesR
+
+boundary ApartmentService as ApartmentS
+
+Funcionário -> DeliveriesC : create(Request, CreateDeliveryDto)
+DeliveriesC -> DeliveriesS : create(User, CreateDeliveryDto)
+DeliveriesS -> ApartmentS : findOne(Id)
+DeliveriesS <-- ApartmentS : Apartment
+
+DeliveriesS -> DeliveriesR : create(Delivery)
+DeliveriesS <-- DeliveriesR : Delivery
+DeliveriesC <-- DeliveriesS : DeliveryResponse
+Funcionário <-- DeliveriesC : DeliveryReponse
+
+@enduml

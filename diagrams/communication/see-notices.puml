@@ -1,0 +1,25 @@
+@startuml
+
+actor Morador
+
+boundary NoticesController as NoticesC
+boundary NoticesService as NoticesS
+boundary NoticesRepository as NoticesR
+
+autonumber
+
+Morador -> NoticesC : findAll(Request)
+NoticesC -> NoticesS : findAllByUserRoles(User)
+NoticesS -> NoticesS : findAllByRoles(Roles)
+NoticesS -> NoticesR : createQueryBuilder()
+NoticesS <- NoticesR : QueryBuilder
+NoticesS -> QueryBuilder : andWhere(Condition, Variables)
+NoticesS <- QueryBuilder : QueryBuilder
+NoticesS -> QueryBuilder : andWhere(Condition, Variables)
+NoticesS <- QueryBuilder : QueryBuilder
+NoticesS -> QueryBuilder : getMany()
+NoticesS <- QueryBuilder : Array<Notice>
+NoticesC <- NoticesS : Array<Notice>
+Morador <- NoticesC : Array<Notice>
+
+@enduml
