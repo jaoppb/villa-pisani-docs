@@ -1,0 +1,286 @@
+@startuml
+' Hide details to focus on relationships and stop overflow
+hide empty members
+hide methods
+hide attributes
+
+left to right direction
+
+' ===================================
+' Core / Shared Package
+' ===================================
+package "Core" {
+    class AppModule
+    class AppController
+    class AppService
+    class DatabaseModule
+    class AppConfigModule
+    class AppConfigService
+    interface Address
+    class CustomLogger
+    class EncryptionModule
+    class PasswordEncryption
+    abstract class File
+    class FilesModule
+    class FilesService
+}
+
+' ===================================
+' Authentication & Authorization
+' ===================================
+package "Authentication" {
+    class AuthModule
+    class AuthController
+    class AuthService
+    class SignUpAuthDto
+    class SignInAuthDto
+    class PayloadAuthDto
+    class CurrentUserDto
+    class JwtStrategy
+    class PublicGuard
+    class AuthGuard
+    class RoleGuard
+    class GlobalGuard
+}
+
+' ===================================
+' Users
+' ===================================
+package "Users" {
+    class UserModule
+    class UserController
+    class UserService
+    class UserGenerateService
+    class User
+    enum Role
+    class SafeUserDto
+    class UpdateUserDto
+    class SelfUpdateUserDto
+}
+
+' ===================================
+' Apartments
+' ===================================
+package "Apartments" {
+    class ApartmentsModule
+    class ApartmentsController
+    class ApartmentsService
+    class Apartment
+    class CreateApartmentDto
+    class UpdateApartmentDto
+    class InviteApartmentDto
+}
+
+' ===================================
+' Bills
+' ===================================
+package "Bills" {
+    class BillsModule
+    class BillsController
+    class BillsService
+    class Bill
+    class CreateBillDto
+    enum Month
+    enum BillState
+
+    package "Files" {
+        class BillFile
+        class BillFilesController
+        class BillFilesService
+        class ReadBillFileDto
+    }
+}
+
+' ===================================
+' Deliveries
+' ===================================
+package "Deliveries" {
+    class DeliveriesModule
+    class DeliveriesController
+    class DeliveriesService
+    class Delivery
+    enum DeliveryStatus
+    class CreateDeliveryDto
+    class DeliveredDeliveryDto
+    class UpdateDeliveryDto
+}
+
+' ===================================
+' Notices
+' ===================================
+package "Notices" {
+    class NoticesModule
+    class NoticesController
+    class NoticesService
+    class Notice
+    enum NoticeTarget
+    class CreateNoticeDto
+    class UpdateNoticeDto
+    class PartialNotice
+    class NoticeTargetDto
+    class ReadNoticeDto
+}
+
+' ===================================
+' Feedback
+' ===================================
+package "Feedback" {
+    class FeedbackModule
+    class FeedbackController
+    class FeedbackService
+    class Feedback
+    class CreateFeedbackDto
+    class UpdateFeedbackDto
+    class ReadFeedbackDto
+}
+
+' ===================================
+' Expenses
+' ===================================
+package "Expenses" {
+    class ExpensesModule
+    class ExpensesController
+    class ExpensesService
+    class Expense
+    class CreateExpenseDto
+    class UpdateExpenseDto
+    
+    package "Tags" {
+        class TagsController
+        class TagsService
+        class Tag
+        class CreateTagDto
+        class UpdateTagDto
+    }
+    
+    package "Files" {
+        class ExpenseFile
+        class ExpenseFileController
+        class ExpenseFilesService
+        class ReadExpenseFileDto
+    }
+}
+
+' ===================================
+' Meetings
+' ===================================
+package "Meetings" {
+    class MeetingsModule
+    class MeetingsController
+    class MeetingsService
+    class Meeting
+    class CreateMeetingDto
+    class UpdateMeetingDto
+    class ParseOptionalDatePipe
+    
+    package "Files" {
+        class MeetingFile
+        class MeetingFilesController
+        class MeetingFilesService
+        class ReadMeetingFileDto
+    }
+}
+
+' ===================================
+' Rules
+' ===================================
+package "Rules" {
+    class RulesModule
+    class RulesController
+    class RulesService
+    class Rule
+    class CreateRuleDto
+    class UpdateRuleDto
+}
+
+' ===================================
+' ### GLOBAL RELATIONSHIPS ###
+' ===================================
+
+' --- Core Dependencies ---
+AppController ..> AppService
+PasswordEncryption ..> AppConfigService
+FilesService ..> AppConfigService
+CustomLogger ..> AppConfigService
+
+' --- Auth Dependencies ---
+AuthController ..> AuthService
+AuthService ..> UserService
+AuthService ..> PasswordEncryption
+AuthService ..> AppConfigService
+AuthService ..> ApartmentsService
+AuthGuard ..> AuthService
+AuthGuard ..> UserService
+GlobalGuard ..> AuthGuard
+GlobalGuard ..> RoleGuard
+GlobalGuard ..> PublicGuard
+
+' --- User Dependencies ---
+UserController ..> UserService
+UserService ..> PasswordEncryption
+UserService ..> ApartmentsService
+UserGenerateService ..> UserService
+UserGenerateService ..> AppConfigService
+
+' --- Entity Relationships (Composition) ---
+User "1" *-- "feedbacks" Feedback
+User "1" *-- "notices" Notice
+Apartment "1" *-- "inhabitants" User
+Apartment "1" *-- "bills" Bill
+Apartment "1" *-- "deliveries" Delivery
+Apartment "1" *-- "notices" Notice
+
+' --- Apartment Dependencies ---
+ApartmentsController ..> ApartmentsService
+ApartmentsController ..> AuthService
+ApartmentsService ..> UserService
+
+' --- Bill Dependencies ---
+BillsController ..> BillsService
+BillsService ..> BillFilesService
+BillsService ..> AppConfigService
+BillFilesController ..> BillFilesService
+BillFilesService ..> FilesService
+Bill "1" *-- "1" BillFile
+
+' --- Delivery Dependencies ---
+DeliveriesController ..> DeliveriesService
+DeliveriesService ..> ApartmentsService
+
+' --- Notice Dependencies ---
+NoticesController ..> NoticesService
+NoticesService ..> UserService
+NoticesService ..> ApartmentsService
+
+' --- Feedback Dependencies ---
+FeedbackController ..> FeedbackService
+
+' --- Expense Dependencies ---
+ExpensesController ..> ExpensesService
+ExpensesService ..> ExpenseFilesService
+ExpensesService ..> TagsService
+ExpenseFilesController ..> ExpenseFilesService
+ExpenseFilesService ..> FilesService
+TagsController ..> TagsService
+Expense "1" *-- "tags" Tag
+Expense "1" *-- "files" ExpenseFile
+
+' --- Meeting Dependencies ---
+MeetingsController ..> MeetingsService
+MeetingsService ..> MeetingFilesService
+MeetingFilesController ..> MeetingFilesService
+MeetingFilesService ..> FilesService
+Meeting "1" *-- "1" MeetingFile
+
+' --- Rule Dependencies ---
+RulesController ..> RulesService
+
+' --- Abstract File Inheritance ---
+BillFile <|-- File
+ExpenseFile <|-- File
+MeetingFile <|-- File
+
+' --- DTO Inheritance ---
+ReadNoticeDto <|-- Notice
+
+@enduml
