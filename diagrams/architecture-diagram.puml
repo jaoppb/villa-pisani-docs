@@ -1,14 +1,86 @@
 @startuml
 
-database PostgresSql as DB
-database S3
-node "REST Api" as API
-node "Front End" as APP
-node Email
+sprite $bProcess jar:archimate/business-process
+sprite $aService jar:archimate/application-service
+sprite $aComponent jar:archimate/application-component
 
-API --> S3
-API --> DB
-API --> Email
-APP --> API
+title Villa Pisani - Archimate Diagram
+
+left to right direction
+
+actor "Morador" as Morador
+actor "Síndico" as Sindico
+actor "Funcionário" as Funcionario
+
+rectangle "<$bProcess>\nVisualização e Gestão de Avisos" as MuralAvisos
+rectangle "<$bProcess>\nGestão de Encomendas" as GestaoEncomendas
+rectangle "<$bProcess>\nGestão Financeira (Boletos/Gastos)" as GestaoFinanceira
+rectangle "<$bProcess>\nGestão de Apartamentos e Usuários" as GestaoCondominio
+rectangle "<$bProcess>\nGestão de Feedbacks" as GestaoFeedback
+rectangle "<$bProcess>\nGestão de Assembleias" as GestaoAssembleias
+
+Morador --> MuralAvisos
+Funcionario --> MuralAvisos
+Morador --> GestaoEncomendas
+Funcionario --> GestaoEncomendas
+Morador --> GestaoFinanceira
+Sindico --> GestaoFinanceira
+Sindico --> GestaoCondominio
+Morador --> GestaoFeedback
+Funcionario --> GestaoFeedback
+Morador --> GestaoAssembleias
+Sindico --> GestaoAssembleias
+
+rectangle "<$aComponent>\nFront End Web App" as WebPortal
+rectangle "<$aComponent>\nREST API System" as Backend
+
+package "Backend Modules" {
+    rectangle "<$aComponent>\nAuthentication Module" as AuthMod
+    rectangle "<$aComponent>\nUsers Module" as UserMod
+    rectangle "<$aComponent>\nApartments Module" as AptMod
+    rectangle "<$aComponent>\nBills Module" as BillMod
+    rectangle "<$aComponent>\nDeliveries Module" as DeliveryMod
+    rectangle "<$aComponent>\nNotices Module" as NoticeMod
+    rectangle "<$aComponent>\nFeedback Module" as FeedbackMod
+    rectangle "<$aComponent>\nExpenses Module" as ExpenseMod
+    rectangle "<$aComponent>\nMeetings Module" as MeetingMod
+    rectangle "<$aComponent>\nRules Module" as RuleMod
+}
+
+Backend *-- AuthMod
+Backend *-- UserMod
+Backend *-- AptMod
+Backend *-- BillMod
+Backend *-- DeliveryMod
+Backend *-- NoticeMod
+Backend *-- FeedbackMod
+Backend *-- ExpenseMod
+Backend *-- MeetingMod
+Backend *-- RuleMod
+
+WebPortal ..> MuralAvisos : serves
+WebPortal ..> GestaoEncomendas : serves
+WebPortal ..> GestaoFinanceira : serves
+WebPortal ..> GestaoCondominio : serves
+WebPortal ..> GestaoFeedback : serves
+WebPortal ..> GestaoAssembleias : serves
+
+WebPortal --> Backend
+
+node "AWS CloudFront" as CDN
+node "AWS EC2" as Compute
+database "PostgresSql (AWS RDS)" as Database
+database "AWS S3" as Storage
+queue "Notification (AWS SQS)" as Queue
+node "Email (AWS SES)" as EmailService
+
+CDN ..> WebPortal : hosts
+Compute ..> Backend : hosts
+
+Compute --> Database
+Compute --> Storage
+Compute --> Queue
+Queue --> EmailService
+EmailService --> Morador : sends emails
 
 @enduml
